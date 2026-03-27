@@ -35,9 +35,9 @@ docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --no-deps rembg
 # Start app separately so rembg health warm-up doesn't abort compose.
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --no-deps app
 
-echo ">>> Waiting for health checks..."
-for i in $(seq 1 15); do
-    sleep 4
+echo ">>> Waiting for health checks (up to 3 minutes)..."
+for i in $(seq 1 30); do
+    sleep 6
 
     if docker exec social-wall-rembg python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:${REMBG_PORT}/health', timeout=3)" >/dev/null 2>&1 \
       && docker exec social-wall-app wget -qO- http://localhost:${APP_PORT}/health >/dev/null 2>&1; then
@@ -48,7 +48,7 @@ for i in $(seq 1 15); do
         exit 0
     fi
 
-    echo "    Attempt $i/15 failed, retrying..."
+    echo "    Attempt $i/30 failed, retrying..."
 done
 
 ROLLBACK_APP_TAG=$(cat "$LAST_GOOD_APP_TAG_FILE" 2>/dev/null || echo "latest")

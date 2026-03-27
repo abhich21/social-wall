@@ -144,11 +144,14 @@ const PORT = process.env.PORT || 3000;
 
 initDatabase().then(() => {
     server.listen(PORT, () => {
-        console.log(`Social Wall server running on http://localhost:${PORT}`);
-        console.log(`  Camera page:  http://localhost:${PORT}/`);
-        console.log(`  Social wall:  http://localhost:${PORT}/wall.html`);
-        console.log(`  Admin login:  http://localhost:${PORT}/login.html`);
-        console.log(`  Admin panel:  http://localhost:${PORT}/admin.html`);
+        const domain = process.env.APP_DOMAIN || `localhost:${PORT}`;
+        const proto = process.env.APP_DOMAIN ? 'https' : 'http';
+        const base = `${proto}://${domain}`;
+        console.log(`Social Wall server running on ${base}`);
+        console.log(`  Camera page:  ${base}/`);
+        console.log(`  Social wall:  ${base}/wall.html`);
+        console.log(`  Admin login:  ${base}/login.html`);
+        console.log(`  Admin panel:  ${base}/admin.html`);
     });
 }).catch((err) => {
     console.error('Failed to initialize database:', err);
