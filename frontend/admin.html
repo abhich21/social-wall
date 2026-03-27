@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Social Wall Admin Panel">
+    <title>Admin — Social Wall</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-left">
+                <h1>🖼️ Social Wall Admin</h1>
+            </div>
+            <div class="header-right">
+                <div class="stats">
+                    <span class="stat" id="stat-active">0 Active</span>
+                    <span class="stat stat-muted" id="stat-archived">0 Archived</span>
+                </div>
+                <div style="width: 1px; height: 32px; background: rgba(0,0,0,0.1); margin: 0 8px;"></div>
+                <button class="btn btn-danger" id="reset-wall-btn" title="Delete everything" style="font-size: 13px;">
+                    ⚠️ Reset Wall
+                </button>
+                <button class="btn btn-primary" id="camera-toggle-btn" title="Toggle Camera Page"
+                    style="min-width: 140px; display: flex; align-items: center; justify-content: center; font-size: 13px;">
+                    Loading...
+                </button>
+                <button class="btn btn-logout" id="logout-btn" title="Logout">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Filters -->
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all" id="filter-all">All</button>
+            <button class="filter-btn" data-filter="active" id="filter-active">Active</button>
+            <button class="filter-btn" data-filter="archived" id="filter-archived">Archived</button>
+        </div>
+
+        <!-- Image Grid -->
+        <main class="admin-grid" id="admin-grid">
+            <!-- Cards injected here -->
+        </main>
+
+        <!-- Empty state -->
+        <div class="admin-empty" id="admin-empty">
+            <p>No images found.</p>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h3 id="modal-title">Confirm Delete</h3>
+            <p id="modal-message">Are you sure you want to permanently delete this image?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+                <button class="btn btn-danger" id="modal-confirm">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Reset Confirm Modal -->
+    <div class="modal-overlay" id="reset-modal-overlay">
+        <div class="modal">
+            <h3 style="color: var(--danger)">⚠️ WARNING: Full Reset</h3>
+            <p>This will PERMANENTLY delete ALL images from the wall, the database, and the server storage. This action
+                CANNOT BE UNDONE.</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="reset-modal-cancel">Cancel</button>
+                <button class="btn btn-danger" id="reset-modal-confirm">I Understand, Delete Everything</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Reset Confirm Modal -->
+    <div class="modal-overlay" id="reset-modal-overlay">
+        <div class="modal">
+            <h3 style="color: var(--danger)">⚠️ WARNING: Full Reset</h3>
+            <p>This will PERMANENTLY delete ALL images from the wall, the database, and the server storage. This action
+                CANNOT BE UNDONE.</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="reset-modal-cancel">Cancel</button>
+                <button class="btn btn-danger" id="reset-modal-confirm">I Understand, Delete Everything</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="edit-modal-overlay">
+        <div class="modal">
+            <h3>Edit Text</h3>
+            <input type="text" id="edit-text-input" maxlength="20" placeholder="Enter text (max 20)" class="modal-input"
+                autocomplete="off">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="edit-cancel">Cancel</button>
+                <button class="btn btn-primary" id="edit-save">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

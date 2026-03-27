@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Social Wall — Live photos from our community">
+    <title>Social Wall</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/wall.css">
+</head>
+
+<body>
+    <div class="wall-container" id="wall-container">
+        <header class="wall-header">
+            <img src="/logo.png" alt="Logo" class="wall-logo"
+                onerror="if(this.src.indexOf('demo-logo.png') === -1) { this.src='/demo-logo.png'; } else { this.style.display='none'; }">
+            <h1 class="wall-title">Live Social Wall</h1>
+        </header>
+
+        <!-- Row 1: moves RIGHT -->
+        <div class="marquee-row" id="row-1" data-direction="right">
+            <div class="marquee-track">
+                <div class="marquee-content" id="content-1"></div>
+                <div class="marquee-content clone" id="clone-1"></div>
+            </div>
+        </div>
+        <!-- Row 2: moves LEFT -->
+        <div class="marquee-row" id="row-2" data-direction="left">
+            <div class="marquee-track">
+                <div class="marquee-content" id="content-2"></div>
+                <div class="marquee-content clone" id="clone-2"></div>
+            </div>
+        </div>
+        <!-- Row 3: moves RIGHT -->
+        <div class="marquee-row" id="row-3" data-direction="right">
+            <div class="marquee-track">
+                <div class="marquee-content" id="content-3"></div>
+                <div class="marquee-content clone" id="clone-3"></div>
+            </div>
+        </div>
+        <!-- Row 4: moves LEFT -->
+        <div class="marquee-row" id="row-4" data-direction="left">
+            <div class="marquee-track">
+                <div class="marquee-content" id="content-4"></div>
+                <div class="marquee-content clone" id="clone-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="empty-state">
+        <div class="empty-icon">📸</div>
+        <h2>No photos yet!</h2>
+        <p>Be the first to share your photo on the wall.</p>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/wall.js"></script>
+</body>
+
+</html>
