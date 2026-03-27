@@ -6,7 +6,7 @@ services:
     env_file: .env
     environment:
       REMBG_MODE: external
-      REMBG_URL: http://social-wall-rembg:5000
+      REMBG_URL: http://social-wall-rembg:${REMBG_PORT:-5001}
     volumes:
       - uploads_data:/app/uploads
       - db_data:/app/backend/db
@@ -15,33 +15,38 @@ services:
       - internal
     depends_on:
       rembg:
-        condition: service_healthy
+        condition: service_started
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.social-wall.rule=Host(`${APP_DOMAIN}`)"
       - "traefik.http.routers.social-wall.entrypoints=websecure"
       - "traefik.http.routers.social-wall.tls.certresolver=letsencrypt"
-      - "traefik.http.services.social-wall.loadbalancer.server.port=3000"
+      - "traefik.http.services.social-wall.loadbalancer.server.port=${PORT:-3000}"
 
   rembg:
     image: ghcr.io/${GITHUB_REPOSITORY}:rembg-${REMBG_IMAGE_TAG:-latest}
     container_name: social-wall-rembg
     restart: unless-stopped
     env_file: .env
+    environment:
+      HOST: 0.0.0.0
+      PORT: ${REMBG_PORT:-5001}
     networks:
       - internal
+    volumes:
+      - rembg_cache:/root/.u2net
     healthcheck:
       test:
         [
           "CMD",
           "python",
           "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=5)"
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:${REMBG_PORT:-5001}/health', timeout=5)"
         ]
-      interval: 15s
+      interval: 10s
       timeout: 5s
-      start_period: 40s
-      retries: 6
+      start_period: 180s
+      retries: 24
 
 networks:
   proxy:
@@ -52,3 +57,4 @@ networks:
 volumes:
   uploads_data:
   db_data:
+  rembg_cache:

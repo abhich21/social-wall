@@ -31,7 +31,7 @@ const upload = multer({
 
 // Remove background using Python FastAPI microservice
 async function removeBackground(imageBuffer) {
-    const rembgUrl = process.env.REMBG_URL || 'http://127.0.0.1:5000';
+    const rembgUrl = process.env.REMBG_URL || 'http://127.0.0.1:5001';
 
     // We send raw bytes to the persistent Python service
     const response = await fetch(`${rembgUrl}/remove-bg`, {

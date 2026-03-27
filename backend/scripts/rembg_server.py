@@ -4,6 +4,7 @@ from rembg import remove
 import io
 import time
 import uvicorn
+import os
 
 app = FastAPI()
 
@@ -39,4 +40,6 @@ async def remove_background(request: Request):
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=5000)
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "5001"))
+    uvicorn.run(app, host=host, port=port)

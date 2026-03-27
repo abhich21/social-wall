@@ -16,6 +16,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/scripts/rembg_server.py ./scripts/rembg_server.py
 
-EXPOSE 5000
+EXPOSE 5001
 
 CMD ["python", "scripts/rembg_server.py"]
