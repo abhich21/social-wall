@@ -19,6 +19,8 @@ const io = new Server(server, {
     cors: { origin: '*' },
 });
 
+const rembgMode = (process.env.REMBG_MODE || 'local').toLowerCase();
+
 // ===========================
 // PYTHON REMBG SERVER MANAGER
 // ===========================
@@ -63,8 +65,12 @@ process.on('exit', () => {
     if (pythonServer) pythonServer.kill();
 });
 
-// Start the Python server
-startPythonServer();
+// Start local Python service only when not managed externally (e.g., Docker rembg container)
+if (rembgMode !== 'external') {
+    startPythonServer();
+} else {
+    console.log('[SYSTEM] REMBG_MODE=external, skipping local Python service startup.');
+}
 
 // ===========================
 // EXPRESS MIDDLEWARE
@@ -88,6 +94,11 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads'), {
 // Public API routes (no auth)
 app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
+
+// Health endpoint used by Docker and deploy scripts
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
 
 // Public endpoint for social wall to fetch active images
 app.get('/api/images', (req, res) => {

@@ -1,0 +1,54 @@
+services:
+  app:
+    image: ghcr.io/${GITHUB_REPOSITORY}:${APP_IMAGE_TAG:-latest}
+    container_name: social-wall-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      REMBG_MODE: external
+      REMBG_URL: http://social-wall-rembg:5000
+    volumes:
+      - uploads_data:/app/uploads
+      - db_data:/app/backend/db
+    networks:
+      - proxy
+      - internal
+    depends_on:
+      rembg:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.social-wall.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.social-wall.entrypoints=websecure"
+      - "traefik.http.routers.social-wall.tls.certresolver=letsencrypt"
+      - "traefik.http.services.social-wall.loadbalancer.server.port=3000"
+
+  rembg:
+    image: ghcr.io/${GITHUB_REPOSITORY}:rembg-${REMBG_IMAGE_TAG:-latest}
+    container_name: social-wall-rembg
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - internal
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=5)"
+        ]
+      interval: 15s
+      timeout: 5s
+      start_period: 40s
+      retries: 6
+
+networks:
+  proxy:
+    external: true
+  internal:
+    driver: bridge
+
+volumes:
+  uploads_data:
+  db_data:

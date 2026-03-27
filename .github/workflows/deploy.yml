@@ -1,0 +1,89 @@
+name: CI/CD Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.11.0'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Basic Node syntax checks
+        run: |
+          node --check backend/server.js
+          node --check backend/routes/auth.js
+          node --check backend/routes/upload.js
+          node --check backend/routes/admin.js
+          node --check backend/db/database.js
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Python syntax check
+        run: python -m py_compile backend/scripts/rembg_server.py
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push app image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: backend/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:latest
+
+      - name: Build and push rembg image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: backend/scripts/rembg.Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:rembg-${{ github.sha }}
+            ghcr.io/${{ github.repository }}:rembg-latest
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            export APP_IMAGE_TAG=${{ github.sha }}
+            export REMBG_IMAGE_TAG=${{ github.sha }}
+            bash /opt/social-wall/scripts/deploy.sh
