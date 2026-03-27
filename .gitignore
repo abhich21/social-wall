@@ -1,0 +1,6 @@
+# VPS/runtime env
+.env
+
+# Deployment state files created on server
+.last-good-app-tag
+.last-good-rembg-tag
