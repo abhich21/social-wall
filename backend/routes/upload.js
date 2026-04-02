@@ -97,7 +97,7 @@ router.post('/', upload.single('image'), async (req, res) => {
 
         // Step 2: Overlay person on solid colored background and compress to webp
         await sharp(processedBuffer)
-            .resize(SIZE, SIZE, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+            .resize(SIZE, SIZE, { fit: 'cover', position: 'north' })
             .flatten({ background: { r, g, b } })
             .webp({ quality: 80, effort: 2 }) // effort 2 speeds up encoding by ~50%
             .toFile(outputPath);
